@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>BlueOn V02 Chat Test</title>
+</head>
+<body>
+
+<h2>BlueOn V02 Socket Test</h2>
+
+<input id="msg" placeholder="메시지 입력" />
+<button id="send">전송</button>
+
+<ul id="log"></ul>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const log = document.getElementById("log");
+
+  function write(text) {
+    const li = document.createElement("li");
+    li.textContent = text;
+    log.appendChild(li);
+  }
+
+  const socket = io("http://localhost:8080", {
+    withCredentials: true,
+    transports: ["websocket", "polling"]
+  });
+
+  socket.on("connect", () => {
+    write("✅ connected: " + socket.id);
+  });
+
+  socket.on("disconnect", () => {
+    write("❌ disconnected");
+  });
+
+  socket.on("chat:message", (msg) => {
+    write("📩 " + msg);
+  });
+
+  document.getElementById("send").onclick = () => {
+    const value = document.getElementById("msg").value;
+    socket.emit("chat:message", value);
+  };
+</script>
+
+</body>
+</html>
